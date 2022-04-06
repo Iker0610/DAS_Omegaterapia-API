@@ -1,6 +1,6 @@
-CREATE TABLE omegaterapia.Users
+CREATE TABLE users
 (
-    Username     VARCHAR(20),
-    Password     TEXT,
-    ProfileImage TEXT
+    username     VARCHAR(20),
+    password     TEXT,
+    profile_image TEXT
 )

@@ -7,8 +7,8 @@ services:
     restart: always
     environment:
       POSTGRES_IP: postgres
-      POSTGRES_USER: omega_admin
-      POSTGRES_PASSWORD: s5v8y/B?D(G+KbPeShVmYq3t6w9z$C&F)H@McQfTjWnZr4u7x!A%D*G-KaNdRgUkXp2s5v8y/B?E(H+MbQeShVmYq3t6w9z$C&F)J@NcRfUjWnZr4u7x!A%D*G-KaPdS
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 837pXuv2W3Wuxk6bz5gAKAB3V8pZLCgKvdJ5j4VRGua5q66PMXZnqtZVreMMtE8M
       POSTGRES_DB: omegaterapia
     ports:
       - "8080:80"
@@ -20,12 +20,12 @@ services:
     build: db/.
     image: postgres-db
     restart: always
+    user: postgres
     expose:
       - "5432"
-
     environment:
-      POSTGRES_USER: omega_admin
-      POSTGRES_PASSWORD: s5v8y/B?D(G+KbPeShVmYq3t6w9z$C&F)H@McQfTjWnZr4u7x!A%D*G-KaNdRgUkXp2s5v8y/B?E(H+MbQeShVmYq3t6w9z$C&F)J@NcRfUjWnZr4u7x!A%D*G-KaPdS
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 837pXuv2W3Wuxk6bz5gAKAB3V8pZLCgKvdJ5j4VRGua5q66PMXZnqtZVreMMtE8M
       POSTGRES_DB: omegaterapia
 
     healthcheck:
