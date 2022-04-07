@@ -1,7 +1,10 @@
+from pathlib import Path
+
 import bcrypt
 from fastapi import Depends, FastAPI, HTTPException, status, UploadFile, File, Request
 from fastapi.responses import FileResponse, RedirectResponse
 from sqlalchemy.orm import Session
+from mimetypes import guess_extension
 
 from . import crud, api_models
 from .database import SessionLocal
@@ -31,7 +34,7 @@ With these entry points you can **send messages via FCM** to Omegaterapia employ
 app = FastAPI(
     title="Omegaterapia API",
     description=description,
-    version="1.0.0",
+    version="1.2.2",
     license_info={
         "name": "Apache 2.0",
         "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
@@ -46,6 +49,9 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+valid_image_mime_types = ['image/jpeg', 'image/png', 'image/webp']
 
 
 # ---------------------------------------------------------
@@ -84,20 +90,31 @@ async def authenticate_user(user_data: api_models.UserAuth, db: Session = Depend
     return user_data
 
 
-@app.get("/users/{username}/profile/image", response_class=FileResponse)
+@app.get("/users/{username}/profile/image", tags=["Users"],
+         status_code=status.HTTP_200_OK, response_class=FileResponse,
+         responses={404: {"description": "User doesn't exists."}})
 async def get_user_profile_image(username: str, db: Session = Depends(get_db)):
     if not (user_profile_image_url := crud.get_user_profile_image_url(db, username=username)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User doesn't exists.")
 
-    return user_profile_image_url
+    if Path(user_profile_image_url).exists():
+        return FileResponse(user_profile_image_url, filename=Path(user_profile_image_url).name)
+    else:
+        return FileResponse("/omegaterapia_api/images/placeholder.svg", filename="placeholder.svg")
 
 
-@app.post("/users/{username}/profile/image")
-async def set_user_profile_image(username: str, file: UploadFile = File(...), db: Session = Depends(get_db)):
+@app.put("/users/{username}/profile/image", tags=["Users"],
+         status_code=status.HTTP_204_NO_CONTENT,
+         responses={404: {"description": "User doesn't exists."}, 400: {"description": f"File is not a valid image file. Valid types: {', '.join(valid_image_mime_types)}"}})
+async def set_user_profile_image(username: str, file: UploadFile, db: Session = Depends(get_db)):
     if not (user := crud.get_user(db, username)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User doesn't exists.")
 
-    path = f'/omegaterapia_api/images/{username}'
+    if file.content_type not in valid_image_mime_types:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"File is not a valid image file. Valid types: {', '.join(valid_image_mime_types)}")
+
+    file_extension = guess_extension(file.content_type)
+    path = f'/omegaterapia_api/images/{username}{file_extension}'
 
     if crud.set_user_profile_image_url(db, user, path):
         contents = await file.read()
