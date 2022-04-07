@@ -1,3 +1,4 @@
+import bcrypt
 from pydantic import BaseModel
 
 
@@ -6,7 +7,13 @@ class UserBase(BaseModel):
 
 
 class UserAuth(UserBase):
-    hashed_password: str
+    password: str
+
+    def hashed_password(self) -> bytes:
+        bytePwd = self.password.encode('utf-8')
+
+        # Hash password with salt
+        return bcrypt.hashpw(bytePwd, bcrypt.gensalt())
 
 
 class User(UserBase):

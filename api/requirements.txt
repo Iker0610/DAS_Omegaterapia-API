@@ -3,3 +3,4 @@ uvicorn==0.17.6
 fastapi==0.75.1
 sqlalchemy==1.4.35
 psycopg2==2.9.3
+bcrypt==3.2.0

@@ -1,6 +1,6 @@
 CREATE TABLE users
 (
-    username     VARCHAR(20),
-    password     TEXT,
+    username      VARCHAR(20),
+    password      bytea,
     profile_image TEXT
 )

@@ -7,7 +7,8 @@ WORKDIR /omegaterapia_api
 # Prepare requirements
 RUN \
  apk add --no-cache postgresql-libs && \
- apk add --no-cache --virtual .build-deps gcc musl-dev postgresql-dev
+ apk add --no-cache --virtual .build-deps gcc musl-dev postgresql-dev && \
+ apk add --no-cache --update musl-dev gcc libffi-dev
 
 # Copy requirements and install
 COPY requirements.txt /omegaterapia_api/requirements.txt
