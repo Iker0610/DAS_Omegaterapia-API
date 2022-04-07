@@ -17,6 +17,23 @@ def get_user_password(db: Session, username: str) -> bytes | None:
     return result.hashed_password if result else result
 
 
+def get_user_profile_image_url(db: Session, username: str) -> str | None:
+    result = db.query(entities.User.profile_image_url).filter(entities.User.username == username).first()
+    return result.profile_image_url if result else result
+
+
+def set_user_profile_image_url(db: Session, user: str | entities.User, url: str) -> bool:
+    if isinstance(user, str):
+        user = get_user(db, user)
+
+    if user:
+        user.profile_image_url = url
+        db.commit()
+        db.refresh(user)
+
+    return bool(user)
+
+
 def create_user(db: Session, user: api_models.UserAuth) -> entities.User | None:
     if get_user(db, username=user.username):
         return None

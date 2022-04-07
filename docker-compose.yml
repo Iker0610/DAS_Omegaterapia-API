@@ -8,7 +8,7 @@ services:
 
     labels:
       - traefik.enable=true
-      - traefik.http.routers.app-http.rule=Host(`api.omegaterapia.ranap.eus`)
+      - traefik.http.routers.app-http.rule=Host(`api.omegaterapia.das.ranap.eus`)
       - traefik.http.routers.app-http.tls=true
       - traefik.http.routers.app-http.tls.certresolver=letsencrypt
 
@@ -22,7 +22,7 @@ services:
       POSTGRES_DB: omegaterapia
 
     volumes:
-      - "/var/api/api/images:/omegaterapia_api/images"
+      - "/var/omegaterapia/api/images:/omegaterapia_api/images"
 
     depends_on:
       postgres:
@@ -67,6 +67,4 @@ services:
 
 volumes:
   db:
-    driver: local
-
   traefik-public-certificates:
