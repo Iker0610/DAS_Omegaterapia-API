@@ -5,7 +5,7 @@ class UserBase(BaseModel):
     username: str
 
 
-class UserCreate(UserBase):
+class UserAuth(UserBase):
     hashed_password: str
 
 

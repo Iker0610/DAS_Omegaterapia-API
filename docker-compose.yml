@@ -5,31 +5,44 @@ services:
     build: api/.
     image: omegaterapia-api
     restart: always
+
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.app-http.rule=Host(`api.omegaterapia.ranap.eus`)
+      - traefik.http.routers.app-http.tls=true
+      - traefik.http.routers.app-http.tls.certresolver=letsencrypt
+
+    expose:
+      - "8000"
+
     environment:
       POSTGRES_IP: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 837pXuv2W3Wuxk6bz5gAKAB3V8pZLCgKvdJ5j4VRGua5q66PMXZnqtZVreMMtE8M
       POSTGRES_DB: omegaterapia
-    ports:
-      - "8080:80"
+
+    volumes:
+      - "/var/api/api/images:/omegaterapia_api/images"
+
     depends_on:
       postgres:
         condition: service_healthy
+
+
 
   postgres:
     build: db/.
     image: postgres-db
     restart: always
+
     user: postgres
-    expose:
-      - "5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 837pXuv2W3Wuxk6bz5gAKAB3V8pZLCgKvdJ5j4VRGua5q66PMXZnqtZVreMMtE8M
       POSTGRES_DB: omegaterapia
 
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
+      test: [ "CMD-SHELL", "pg_isready" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -37,6 +50,23 @@ services:
     volumes:
       - db:/var/lib/postgresql/data
 
+
+  traefik:
+    image: traefik:latest
+    restart: always
+
+    ports:
+      - "80:80"
+      - "443:443"
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - $PWD/services/traefik/traefik.toml:/etc/traefik/traefik.toml
+      - traefik-public-certificates:/certificates
+
+
 volumes:
   db:
     driver: local
+
+  traefik-public-certificates:

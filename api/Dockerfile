@@ -20,4 +20,4 @@ RUN  apk --purge del .build-deps
 COPY app /omegaterapia_api/app
 
 # Run uvicorn server with our API on port 80
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "app.main:app", "--proxy-headers", "--host", "0.0.0.0"]
