@@ -9,7 +9,7 @@ from .database import SessionLocal
 description: str = """
 This api allows you to authorize as an Omegaterapia employee and retrieve user data.
 
-> An internal auth-token is required for al entry-points.
+==An internal auth-token is required for al entry-points.==
 
 
 ## Entry Points
@@ -57,7 +57,7 @@ async def root():
     return RedirectResponse(url='/docs')
 
 
-@app.post("/users/", response_model=api_models.UserBase, status_code=status.HTTP_201_CREATED)
+@app.post("/users/", response_model=api_models.User, status_code=status.HTTP_201_CREATED)
 def create_user(user: api_models.UserAuth, db: Session = Depends(get_db)):
     db_user = crud.create_user(db=db, user=user)
     if not db_user:
@@ -65,14 +65,14 @@ def create_user(user: api_models.UserAuth, db: Session = Depends(get_db)):
     return db_user
 
 
-@app.get("/users/", response_model=list[api_models.UserBase], status_code=status.HTTP_200_OK)
+@app.get("/users/", response_model=list[api_models.User], status_code=status.HTTP_200_OK)
 def get_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return crud.get_users(db, skip, limit)
 
 
-@app.post("/auth", response_model=api_models.UserBase, status_code=status.HTTP_200_OK)
+@app.post("/auth", response_model=api_models.User, status_code=status.HTTP_200_OK)
 def authenticate_user(user_data: api_models.UserAuth, db: Session = Depends(get_db)):
     hashed_password = crud.get_user_password(db, username=user_data.username)
     if hashed_password is None or not bcrypt.checkpw(user_data.password.encode('utf-8'), hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect authorization information.")
-    return user_data.username
+    return user_data
