@@ -1,3 +1,4 @@
+from sqlalchemy.engine import row
 from sqlalchemy.orm import Session
 
 from . import entities, api_models
@@ -7,12 +8,13 @@ def get_user(db: Session, username: str) -> entities.User | None:
     return db.query(entities.User).filter(entities.User.username == username).first()
 
 
-def get_users(db: Session, skip: int = 0, limit: int = 100) -> list[str]:
+def get_users(db: Session, skip: int = 0, limit: int = 100) -> list[row]:
     return db.query(entities.User.username).offset(skip).limit(limit).all()
 
 
 def get_user_password(db: Session, username: str) -> bytes | None:
-    return db.query(entities.User.hashed_password).filter(entities.User.username == username).first()
+    result = db.query(entities.User.hashed_password).filter(entities.User.username == username).first()
+    return result.hashed_password if result else result
 
 
 def create_user(db: Session, user: api_models.UserAuth) -> entities.User | None:

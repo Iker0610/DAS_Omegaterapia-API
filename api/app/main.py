@@ -9,7 +9,7 @@ from .database import SessionLocal
 description: str = """
 This api allows you to authorize as an Omegaterapia employee and retrieve user data.
 
-==An internal auth-token is required for al entry-points.==
+*An internal auth-token is required for al entry-points.*
 
 
 ## Entry Points
@@ -59,8 +59,10 @@ async def root():
 
 @app.post("/users/", response_model=api_models.User, status_code=status.HTTP_201_CREATED)
 def create_user(user: api_models.UserAuth, db: Session = Depends(get_db)):
-    db_user = crud.create_user(db=db, user=user)
-    if not db_user:
+    if len(user.password) < 5:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password is not valid.")
+
+    if not (db_user := crud.create_user(db=db, user=user)):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Username already registered.")
     return db_user
 
