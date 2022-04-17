@@ -1,7 +1,8 @@
 from sqlalchemy.engine import row
 from sqlalchemy.orm import Session
 
-from . import entities, api_models
+from . import entities
+from .. import api_models
 
 
 def get_user(db: Session, username: str) -> entities.User | None:

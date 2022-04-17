@@ -18,3 +18,11 @@ class UserAuth(User):
         # Hash password with salt
         return bcrypt.hashpw(bytePwd, bcrypt.gensalt())
 
+
+class Message(BaseModel):
+    title: str
+    body: str | None
+
+
+class FirebaseClientToken(BaseModel):
+    fcm_client_token: str

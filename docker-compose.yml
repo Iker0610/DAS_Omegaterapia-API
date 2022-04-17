@@ -20,9 +20,12 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 837pXuv2W3Wuxk6bz5gAKAB3V8pZLCgKvdJ5j4VRGua5q66PMXZnqtZVreMMtE8M
       POSTGRES_DB: omegaterapia
+      API_JWT_SECRET_KEY: $${API_JWT_SECRET_KEY:?err}
+      FIREBASE_CREDENTIALS: ${API_FIREBASE_CREDENTIALS}
 
     volumes:
       - "/var/omegaterapia/api/images:/omegaterapia_api/images"
+      - "${CREDENTIALS_FOLDER}:${API_CREDENTIALS_FOLDER}"
 
     depends_on:
       postgres:
