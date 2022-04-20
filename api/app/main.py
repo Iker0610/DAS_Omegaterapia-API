@@ -140,8 +140,8 @@ async def get_users(skip: int = 0, limit: int = 100, _: str = Depends(get_verifi
 @app.get("/profile/image", tags=["Users"],
          status_code=status.HTTP_200_OK, response_class=FileResponse,
          responses={404: {"description": "User doesn't exists."}})
-async def get_user_profile_image(username: str, current_user: str = Depends(get_verified_current_user), db: Session = Depends(get_db)):
-    if not (user_profile_image_url := crud.get_user_profile_image_url(db, username=username)):
+async def get_user_profile_image(current_user: str = Depends(get_verified_current_user), db: Session = Depends(get_db)):
+    if not (user_profile_image_url := crud.get_user_profile_image_url(db, username=current_user)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User doesn't exists.")
 
     if Path(user_profile_image_url).exists():
@@ -153,15 +153,15 @@ async def get_user_profile_image(username: str, current_user: str = Depends(get_
 @app.put("/profile/image", tags=["Users"],
          status_code=status.HTTP_204_NO_CONTENT,
          responses={404: {"description": "User doesn't exists."}, 400: {"description": f"File is not a valid image file. Valid types: {', '.join(VALID_IMAGE_MIME_TYPES)}"}})
-async def set_user_profile_image(username: str, file: UploadFile, current_user: str = Depends(get_verified_current_user), db: Session = Depends(get_db)):
-    if not (user := crud.get_user(db, username)):
+async def set_user_profile_image(file: UploadFile, current_user: str = Depends(get_verified_current_user), db: Session = Depends(get_db)):
+    if not (user := crud.get_user(db, current_user)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User doesn't exists.")
 
     if file.content_type not in VALID_IMAGE_MIME_TYPES:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"File is not a valid image file. Valid types: {', '.join(VALID_IMAGE_MIME_TYPES)}")
 
     file_extension = guess_extension(file.content_type)
-    path = f'/omegaterapia_api/images/{username}{file_extension}'
+    path = f'/omegaterapia_api/images/{current_user}{file_extension}'
 
     if crud.set_user_profile_image_url(db, user, path):
         contents = await file.read()
