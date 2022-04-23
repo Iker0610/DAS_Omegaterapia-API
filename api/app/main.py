@@ -1,4 +1,3 @@
-from datetime import datetime
 from mimetypes import guess_extension
 from os import environ
 from pathlib import Path
@@ -106,7 +105,7 @@ async def refresh(form_data: OAuth2RefreshTokenForm = Depends(), db: Session = D
                 "token_type": "bearer",
                 "expires_in": expire_in_seconds,
                 "access_token": access_token,
-                'refresh_token': token,
+                'refresh_token': create_refresh_token(data={"sub": username}),
             }
         else:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="This user does not exist.")
@@ -147,7 +146,7 @@ async def get_user_profile_image(current_user: str = Depends(get_verified_curren
     if Path(user_profile_image_url).exists():
         return FileResponse(user_profile_image_url, filename=Path(user_profile_image_url).name)
     else:
-        return FileResponse("/omegaterapia_api/images/placeholder.svg", filename="placeholder.svg")
+        return FileResponse("/omegaterapia_api/images/placeholder.png", filename="placeholder.png")
 
 
 @app.put("/profile/image", tags=["Users"],
@@ -170,7 +169,6 @@ async def set_user_profile_image(file: UploadFile, current_user: str = Depends(g
 
 
 # ---------------------------------------------------------
-
 
 @app.post('/notifications/subscribe', status_code=status.HTTP_202_ACCEPTED, tags=["Notifications"])
 def suscribe_user_to_alert(token: FirebaseClientToken, current_user: str = Depends(get_verified_current_user)):

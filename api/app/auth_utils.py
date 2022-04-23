@@ -16,8 +16,8 @@ from .model.database import get_db
 # ---------------------------------------------------------
 SECRET_KEY = environ['API_JWT_SECRET_KEY']
 ALGORITHM = environ.get('API_JWT_ALGORITHM') or "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 15
-REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24
+ACCESS_TOKEN_EXPIRE_MINUTES = 5
+REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24  # One day
 
 CREDENTIALS_EXCEPTION = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
